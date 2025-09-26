@@ -76,9 +76,19 @@ The project's iterative progression yielded significant performance improvements
 | Simple GNN (Post-Debugging)        | ~56.55                        | Proved the viability of graph-based learning after stabilization.               |
 | Hybrid GNN-MLP (Final Architecture)| (Training in Progress)        | The most powerful and promising architecture, combining two ML paradigms.       |
 
-
 # Feature Importance Analysis (LightGBM)
 The feature importance plot from our best classical model confirms the value of our RDKit feature engineering strategy. The top predictors are almost exclusively these engineered features, not the original "Group" features.
 
+![Feature Importance](plot/feature_imp_lightgbm.png)
+
 This validates our initial hypothesis that the raw SMILES string contained immense untapped potential.
 
+# 5. Interpretation & Insights
+* **Classical vs. Graph Methods:** This project provides a powerful case study on the trade-offs between classical ML and GNNs. For this dataset, a meticulously engineered feature set with a strong ensemble model proved extremely effective and set a very high bar for performance.
+
+* **The Power of Hybridization:** The final hybrid architecture is the key takeaway. It demonstrates that the future of ML in scientific domains is not a battle between "feature engineering" and "representation learning," but a synthesis of the two. GNNs excel at learning local, complex structural patterns, while global, human-engineered features provide invaluable context.
+
+* **The Reality of Deep Learning:** The GNN debugging phase was a critical part of the project. It highlights that applying deep learning is not a "plug-and-play" solution. Success requires a deep, practical understanding of training dynamics, stabilization techniques, and systematic debugging—skills that are paramount in a production environment.
+
+# 6. Conclusion
+This project successfully developed and contrasted multiple advanced machine learning solutions for a challenging problem in chemical property prediction. It demonstrates a clear, strategic progression from a high-performing classical ensemble to a hybrid Graph Neural Network. The final architecture combines learned structural representations with domain-specific features, creating a powerful and interpretable model
