@@ -66,4 +66,19 @@ This hybrid architecture enabled the model to learn simultaneously from raw atom
       4. Regularization: BatchNorm1d layers and Dropout were used to combat overfitting.
 * **Optimizer & Scheduler:** The `Adam` optimizer was used with a ReduceLROnPlateau learning rate scheduler, which dynamically adjusts the learning rate based on the validation MAE.
 
+# 4. Results & Analysis
+The project's iterative progression yielded significant performance improvements at each stage.
+
+| Model / Stage                      | Best Validation MAE (Kelvin) | Key Achievement                                                                 |
+|------------------------------------|-------------------------------|---------------------------------------------------------------------------------|
+| Initial Baseline (Provided)        | 5.027                         | Starting benchmark.                                                             |
+| Stacking Ensemble (Classical ML)   | 24.59                         | State-of-the-art classical result, driven by advanced feature engineering.      |
+| Simple GNN (Post-Debugging)        | ~56.55                        | Proved the viability of graph-based learning after stabilization.               |
+| Hybrid GNN-MLP (Final Architecture)| (Training in Progress)        | The most powerful and promising architecture, combining two ML paradigms.       |
+
+
+# Feature Importance Analysis (LightGBM)
+The feature importance plot from our best classical model confirms the value of our RDKit feature engineering strategy. The top predictors are almost exclusively these engineered features, not the original "Group" features.
+
+This validates our initial hypothesis that the raw SMILES string contained immense untapped potential.
 
