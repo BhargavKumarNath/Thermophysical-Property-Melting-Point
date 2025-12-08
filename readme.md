@@ -19,7 +19,7 @@ Before moving to complex architectures, it was essential to establish a powerful
 
 1. **Advanced Feature Engineering:** The initial dataset provided SMILES strings and a sparse set of "Group" features. We recognized the SMILES string as a rich source of latent information and used the RDKit library to generate over 200 expert-level chemical descriptors (e.g., Morgan fingerprints, topological surface area, molecular weight). This step was critical as it immediately unlocked significant predictive power.
 
-2. **Ensemble Modeling:** A comprehensive benchmark was performed across a suite of powerful models, including LightGBM, XGBoost, and CatBoost. To maximize performance, a Stacking Ensemble was constructed, using a RidgeCV meta-model to learn the optimal combination of predictions from the strongest base models. This classical pipeline achieved a robust cross-validated Mean Absolute Error of 24.59 K.
+2. **Ensemble Modeling:** A comprehensive benchmark was performed across a suite of powerful models, including LightGBM, XGBoost, and CatBoost. To maximize performance, a Stacking Ensemble was constructed, using a RidgeCV meta-model to learn the optimal combination of predictions from the strongest base models. This classical pipeline achieved a robust cross-validated Mean Absolute Error of **24.59 K**.
 
 ## Stage 2: The Pivol to Graph Representation Learning
 While the ensemble was strong, it still operated on a flattened representation of the data. To achieve a breakthrough, we pivoted to a model that could learn directly from the molecular graph.
@@ -38,13 +38,13 @@ Our initial GNN models, while stable after a rigorous debugging process (see Imp
 
 We designed a novel **Hybrid Graph Neural Network** with a dual-input structure:
 
-1. GNN Branch: A Graph Convolutional Network (GCN) ingests the molecular graph, using message passing over several layers to learn a local, structural embedding that captures the chemical neighborhood of each atom.
+1. **GNN Branch:** A Graph Convolutional Network (GCN) ingests the molecular graph, using message passing over several layers to learn a local, structural embedding that captures the chemical neighborhood of each atom.
 
-2. MLP Branch: A standard feed-forward path ingests the high-level, global RDKit features (e.g., total surface area, logP), which provide a summarized context that is complementary to the GNN's local view.
+2. **MLP Branch:** A standard feed-forward path ingests the high-level, global RDKit features (e.g., total surface area, logP), which provide a summarized context that is complementary to the GNN's local view.
 
-3. Fusion Layer: The learned graph embedding vector is concatenated with the vector of RDKit features.
+3. **Fusion Layer:** The learned graph embedding vector is concatenated with the vector of RDKit features.
 
-4. Prediction Head: This final, combined "super-vector" is passed to a multi-layer perceptron (MLP) which makes the final regression prediction for the melting point.
+4. **Prediction Head:** This final, combined "super-vector" is passed to a multi-layer perceptron (MLP) which makes the final regression prediction for the melting point.
 
 This hybrid architecture enabled the model to learn simultaneously from raw atomic connectivity and expert-crafted global descriptors, resulting in a more holistic and powerful representation of the molecule
 
@@ -52,29 +52,26 @@ This hybrid architecture enabled the model to learn simultaneously from raw atom
 * **Frameworks & Libraries:** ``PyTorch``, ``PyTorch Geometric`` (for GNNs), ``RDKit`` (for cheminformatics), ``Scikit-learn``, ``LightGBM``, ``XGBoost``, ``Optuna`` (for hyperparameter tuning).
 
 * **Data Preprocessing:**
-    * The target variable ``Tm`` was log-transformed to normalize its distribution and stabilize model training. All final predictions are inverse-transformed (`np.exp()`) before MAE calculation.
+    * The target variable `Tm` was log-transformed to normalize its distribution and stabilize model training. All final predictions are inverse-transformed (`np.expm1()`) before MAE calculation.
     * **Feature Scaling:** `StandardScaler` was critical. It was applied independently to the GNN's node features and the MLP's RDKit features, with the scaler being fit only on the training data in each case to prevent data leakage.
-
 * **GNN Training & Stabilization:**
     * The initial GNN training was unstable. This was systematically debugged and resolved by implementing:
       1. **Node Feature Scaling:** The most critical step.
-
       2. **Loss Function:** Switched from MSE to `L1Loss` (MAE) to align the training objective with the competition metric and reduce sensitivity to outliers.
-
       3. **Gradient Clipping:** `torch.nn.utils.clip_grad_norm_` was used to prevent exploding gradients.
-
-      4. Regularization: BatchNorm1d layers and Dropout were used to combat overfitting.
+      4. **Regularization:** BatchNorm1d layers and Dropout were used to combat overfitting.
 * **Optimizer & Scheduler:** The `Adam` optimizer was used with a ReduceLROnPlateau learning rate scheduler, which dynamically adjusts the learning rate based on the validation MAE.
 
 # 4. Results & Analysis
 The project's iterative progression yielded significant performance improvements at each stage.
 
-| Model / Stage                      | Best Validation MAE (Kelvin) | Key Achievement                                                                 |
-|------------------------------------|-------------------------------|---------------------------------------------------------------------------------|
-| Initial Baseline (Provided)        | 5.027                         | Starting benchmark.                                                             |
-| Stacking Ensemble (Classical ML)   | 24.59                         | State-of-the-art classical result, driven by advanced feature engineering.      |
-| Simple GNN (Post-Debugging)        | ~56.55                        | Proved the viability of graph-based learning after stabilization.               |
-| Hybrid GNN-MLP (Final Architecture)| (Training in Progress)        | The most powerful and promising architecture, combining two ML paradigms.       |
+| Model / Stage                      | Validation MAE (Kelvin) | Key Insight                                                                     |
+|------------------------------------|-------------------------|---------------------------------------------------------------------------------|
+| Random Forest (Baseline)           | 30.69                   | Strong initial baseline using expert descriptors.                               |
+| LightGBM (Tuned)                   | 27.92                   | Improved performance via gradient boosting and hyperparameter optimization.     |
+| **Stacking Ensemble (Best)** | **27.34** | **SOTA Performance.** Proves the power of ensembles on engineered features.     |
+| Simple GNN (GCN)                   | ~56.55                  | Demonstrated that structural learning alone struggled to capture global physicochemical properties. |
+| **Hybrid GNN-MLP** | **30.28** | **Key Result.** Adding global features drastically improved GNN performance, nearly matching the strong Random Forest baseline. |
 
 # Feature Importance Analysis (LightGBM)
 The feature importance plot from our best classical model confirms the value of our RDKit feature engineering strategy. The top predictors are almost exclusively these engineered features, not the original "Group" features.
@@ -84,11 +81,11 @@ The feature importance plot from our best classical model confirms the value of 
 This validates our initial hypothesis that the raw SMILES string contained immense untapped potential.
 
 # 5. Interpretation & Insights
-* **Classical vs. Graph Methods:** This project provides a powerful case study on the trade-offs between classical ML and GNNs. For this dataset, a meticulously engineered feature set with a strong ensemble model proved extremely effective and set a very high bar for performance.
+* **The "Deep Learning Gap":** While GNNs are theoretically powerful, this project highlights that for tabular/structured chemical data, a well-tuned Gradient Boosting Ensemble with expert features is incredibly difficult to beat. The Stacking Ensemble (27.34 K) remains the champion.
 
-* **The Power of Hybridization:** The final hybrid architecture is the key takeaway. It demonstrates that the future of ML in scientific domains is not a battle between "feature engineering" and "representation learning," but a synthesis of the two. GNNs excel at learning local, complex structural patterns, while global, human-engineered features provide invaluable context.
+* **The Success of Hybridization:** The most significant finding is the leap in performance from the Simple GNN (56.55 K) to the Hybrid GNN (30.28 K). This proves that **GNNs need context**. Local atomic message passing is powerful, but it struggles to infer global molecular properties (like molecular weight or surface area) that are explicitly provided to the classical models. By fusing these explicit global features with the GNN's learned local embeddings, we nearly doubled the model's accuracy.
 
-* **The Reality of Deep Learning:** The GNN debugging phase was a critical part of the project. It highlights that applying deep learning is not a "plug-and-play" solution. Success requires a deep, practical understanding of training dynamics, stabilization techniques, and systematic debugging—skills that are paramount in a production environment.
+* **Production Readiness:** While the Ensemble is slightly more accurate, the Hybrid GNN offers a differentiable, end-to-end framework that could be fine-tuned on larger datasets or used for multi-task learning, potentially surpassing classical methods in a larger-scale setting.
 
 # 6. Conclusion
-This project successfully developed and contrasted multiple advanced machine learning solutions for a challenging problem in chemical property prediction. It demonstrates a clear, strategic progression from a high-performing classical ensemble to a hybrid Graph Neural Network. The final architecture combines learned structural representations with domain-specific features, creating a powerful and interpretable model
+This project successfully developed and contrasted multiple advanced machine learning solutions for a challenging problem in chemical property prediction. It demonstrates a clear strategic progression from classical baselines to deep geometric deep learning. The final results underscore a crucial lesson in AI for Science: **domain knowledge (feature engineering) combined with representation learning (GNNs) often yields better results than either approach alone.**
