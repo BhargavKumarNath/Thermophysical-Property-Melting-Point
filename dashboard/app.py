@@ -598,7 +598,14 @@ def show_inference():
                 <div class="metric-label">{(pred_k - 273.15):.1f} °C</div>
             </div>
             """, unsafe_allow_html=True)
-            st.image(Draw.MolToImage(mol), width='stretch', caption="Structure")
+            if Draw is not None:
+                st.image(
+                    Draw.MolToImage(mol),
+                    use_container_width=True,
+                    caption="Structure"
+                )
+            else:
+                st.info("Molecular structure visualization is disabled in the cloud environment")
             
         with c_ctx:
             st.markdown("#### Prediction Context")
