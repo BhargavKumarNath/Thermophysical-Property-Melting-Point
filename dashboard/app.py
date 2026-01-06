@@ -13,7 +13,11 @@ from torch_geometric.nn import GCNConv, global_mean_pool
 from torch_geometric.data import Data
 from rdkit import Chem
 from rdkit.Chem import Descriptors
-from rdkit.Chem import Draw
+try:
+    from rdkit.Chem import Draw
+except ImportError:
+    Draw = None
+
 from rdkit.ML.Descriptors import MoleculeDescriptors
 
 # 0. CONFIGURATION

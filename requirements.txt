@@ -1,6 +1,6 @@
 streamlit
 
-numpy
+numpy<2
 pandas
 scipy
 scikit-learn
