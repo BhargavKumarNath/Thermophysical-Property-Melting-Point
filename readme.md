@@ -17,6 +17,9 @@ This repository documents a complete end to end machine learning pipeline for pr
 
 **Final Validated Result (Classical Ensemble):** Mean Absolute Error of 24.59 K
 
+[![Live Demo](https://img.shields.io/badge/Live-Dashboard-brightgreen?style=for-the-badge)](https://thermophysical-property-melting-point.streamlit.app)
+
+
 # 1. Problem Statement & Motivation
 Predicting the melting point (Tm) of organic compounds is a long-standing and critical challenge in chemistry and materials science. This property is fundamental to drug discovery, materials design, and industrial process safety. However, experimental measurements are often resource-intensive, time-consuming, or simply not feasible for novel or theoretical compounds.
 
